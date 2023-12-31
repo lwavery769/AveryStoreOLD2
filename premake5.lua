@@ -32,19 +32,21 @@ project "Engine"
 	}
 	defines
 	{
+		"AL_PLATFORM_WINDOWS",
 		"_CRT_SECURE_NO_WARNINGS",
 		"GLFW_INCLUDE_NONE"
 	}
 	includedirs
 	{
 		"%{prj.name}/src",
+		"%{prj.name}/vendor",
 		"%{prj.name}/vendor/spdlog/include"
 		
 	}
-
+	libdirs{"%(ProjectDir)vendor/glfw"}
 	links 
 	{ 
-		--"GLFW",
+		"glfw3_mt.lib"
 		--"Glad",
 		--"ImGui",
 		--"opengl32.lib"
@@ -89,7 +91,8 @@ project "StoreGame"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/src/glad.c"
 	}
 
 	includedirs
@@ -99,9 +102,10 @@ project "StoreGame"
 		"Engine/vendor"
 		--"%{IncludeDir.glm}"
 	}
-
-	links
-	{
+	libdirs{"Engine/vendor/glfw"}
+	links 
+	{ 
+		"glfw3_mt.lib",
 		"Engine"
 	}
 
@@ -118,10 +122,14 @@ project "StoreGame"
 	filter "configurations:Debug"
 		defines "HZ_DEBUG"
 		symbols "on"
+		staticruntime "on"
+		runtime "Debug"
 
 	filter "configurations:Release"
 		defines "HZ_RELEASE"
 		optimize "on"
+		staticruntime "on"
+		runtime "Release"
 
 	filter "configurations:Dist"
 		defines "HZ_DIST"
