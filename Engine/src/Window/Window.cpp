@@ -11,13 +11,24 @@
 namespace ALStore {
 
 	Window::Window() {}
-	Window::~Window(){ glfwDestroyWindow(m_gWindow); }
+	Window::~Window(){ glfwDestroyWindow(m_Window); }
+	static void GLFWErrorCallback(int error, const char* description)
+	{
+		AL_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+	}
+
 	bool Window::init() {
 		if (!glfwInit()) AL_CORE_CRITICAL("GLFW FAILED");
-		//glfwSetErrorCallback(GLFWErrorCallback);
-		m_gWindow = glfwCreateWindow(800, 600, "ALAvery", NULL, NULL);
-		if (!m_gWindow) { AL_CORE_CRITICAL("GLFW WINDOW CREATION FAILED"); return false; }
-		glfwMakeContextCurrent(m_gWindow);
+		glfwSetErrorCallback(GLFWErrorCallback);
+		m_Window = glfwCreateWindow(800, 600, "ALAvery", NULL, NULL);
+		if (!m_Window) { AL_CORE_CRITICAL("GLFW WINDOW CREATION FAILED"); return false; }
+		m_Data.Title = "ALAvery"; // props.Title;
+		m_Data.Width = 800; // props.Width;
+		m_Data.Height = 600; // props.Height;
+
+		//AL_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+
+		glfwMakeContextCurrent(m_Window);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -31,9 +42,12 @@ namespace ALStore {
 		//////////////////glEnable(GL_DEPTH_TEST); // enable depth-testing
 		glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 		glfwSwapInterval(1); //SetVSync(true);
-		glfwSetWindowUserPointer(m_gWindow, &m_Data);
+		
+	
+		glfwSetWindowUserPointer(m_Window, &m_Data);
+
 		// Set GLFW callbacks
-		glfwSetWindowSizeCallback(m_gWindow, [](GLFWwindow* window, int width, int height)
+		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 				data.Width = width;
@@ -43,14 +57,14 @@ namespace ALStore {
 				data.EventCallback(event);
 			});
 
-		glfwSetWindowCloseCallback(m_gWindow, [](GLFWwindow* window)
+		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 				WindowCloseEvent event;
 				data.EventCallback(event);
 			});
 
-		glfwSetKeyCallback(m_gWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -77,7 +91,7 @@ namespace ALStore {
 				}
 			});
 
-		glfwSetMouseButtonCallback(m_gWindow, [](GLFWwindow* window, int button, int action, int mods)
+		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -98,7 +112,7 @@ namespace ALStore {
 				}
 			});
 
-		glfwSetScrollCallback(m_gWindow, [](GLFWwindow* window, double xOffset, double yOffset)
+		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
@@ -106,8 +120,8 @@ namespace ALStore {
 				data.EventCallback(event);
 			});
 
-		glfwSetCursorPosCallback(m_gWindow, [](GLFWwindow* window, double xPos, double yPos)
-			{//https://stackoverflow.com/questions/29356783/glfwsetcursorposcallback-to-function-in-another-class
+		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos)
+			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
 				MouseMovedEvent event((float)xPos, (float)yPos);
@@ -115,10 +129,34 @@ namespace ALStore {
 			});
 		return true;
 	}
+	void Window::showFPS(GLFWwindow* pWindow)
+	{
+		//float time = (float)glfwGetTime();
+		//Timestep timestep = time - m_LastFrameTime;
+		//m_LastFrameTime = time;
+	   // HZ_CORE_INFO(time);
+		// Measure speed
+		double currentTime = glfwGetTime();
+		double delta = currentTime - lastTime;
+		nbFrames++;
+		if (delta >= 1.0) { // If last cout was more than 1 sec ago
+			//cout << 1000.0 / double(nbFrames) << endl;
 
+			double fps = double(nbFrames) / delta;
+
+			std::stringstream ss;
+			ss << "My game" << " [" << fps << " FPS]";
+
+			glfwSetWindowTitle(pWindow, ss.str().c_str());
+
+			nbFrames = 0;
+			lastTime = currentTime;
+		}
+	}
 	void Window::OnUpdate() {
 		glfwPollEvents();
-		glfwSwapBuffers(m_gWindow);
+		glfwSwapBuffers(m_Window);
+		showFPS(m_Window);
 	}
 	void Window::OnShutdown() { glfwTerminate(); }
 }

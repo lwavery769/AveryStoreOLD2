@@ -1,2 +1,10 @@
 #pragma once
 #include "core/Log.h"
+#include "Events/Event.h"
+#include "Events/ApplicationEvent.h"
+#include "Events/MouseEvent.h"
+#include "Events/KeyEvent.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/glm/ext.hpp"
+#include "render/OrthographicCamera.h"
+#include "Window/Window.h"

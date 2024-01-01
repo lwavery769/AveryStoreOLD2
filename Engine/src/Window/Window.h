@@ -9,17 +9,28 @@ namespace ALStore {
 	public:
 		Window();
 		~Window();
+		struct WindowProps
+		{
+			std::string Title;
+			uint32_t Width;
+			uint32_t Height;
+
+			WindowProps(const std::string& title = "Odyssey Engine",
+				uint32_t width = 1280,
+				uint32_t height = 720)
+				: Title(title), Width(width), Height(height)
+			{
+			}
+		};
 		bool init();
 		void OnUpdate();
 		void OnShutdown();
+		void setRunning(bool r) { m_running = r; }
+		bool isRunning() { return m_running; }
+
+		void showFPS(GLFWwindow* pWindow);
 		using EventCallbackFn = std::function<void(Event&)>;
 		inline void SetEventCallback(const EventCallbackFn& callback) { m_Data.EventCallback = callback; }
-
-	private:
-		bool m_Minimized = false;
-		int width, height;
-
-		GLFWwindow* m_gWindow;
 		struct WindowData
 		{
 			std::string Title;
@@ -30,6 +41,14 @@ namespace ALStore {
 		};
 
 		WindowData m_Data;
+	private:
+		bool m_running = true;
+		bool m_Minimized = false;
+		int width, height;
+		double lastTime, nbFrames;
+		float m_LastFrameTime = 0.0f;
+		GLFWwindow* m_Window;
+	
 	};
 
 }
