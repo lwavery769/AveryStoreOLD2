@@ -111,14 +111,13 @@ namespace ALStore {
 		s_Data.TextureShader->UploadUniformInt("uniqueID", 52);
 		s_Data.QuadIndexCount = 0;
 		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-		//s_Data.TextureSlotIndex = 1;
+		s_Data.TextureSlotIndex = 1;
 	}
 	void Render2D::Flush()
 	{
 		//HZ_PROFILE_FUNCTION();
 		if (s_Data.QuadIndexCount == 0)	return; // Nothing to draw
-		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
-			s_Data.TextureSlots[i]->Bind(i);// s_Data.TruckTexture->GetRendererID());
+		//for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)s_Data.TextureSlots[i]->Bind(i);// s_Data.TruckTexture->GetRendererID());
 		DrawIndexed();
 	}
 	void Render2D::DrawIndexed()
@@ -152,7 +151,7 @@ namespace ALStore {
 				break;
 			}
 		}
-
+		/*
 		if (textureIndex == 0.0f)
 		{
 			if (s_Data.TextureSlotIndex >= Renderer2DStorage::MaxTextureSlots)
@@ -162,7 +161,7 @@ namespace ALStore {
 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
 			s_Data.TextureSlotIndex++;
 		}
-
+		*/
 		for (size_t i = 0; i < quadVertexCount; i++)
 		{
 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];

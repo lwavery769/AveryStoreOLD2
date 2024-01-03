@@ -8,3 +8,6 @@
 #include "glm/glm/ext.hpp"
 #include "render/OrthographicCamera.h"
 #include "Window/Window.h"
+#include "Render/Render2D.h"
+#include "Render/Texture2D.h"
+#include "Render/Maths.h"
